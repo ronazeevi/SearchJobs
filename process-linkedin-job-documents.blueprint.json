@@ -1,0 +1,1759 @@
+{
+    "name": "Process LinkedIn Job Documents",
+    "flow": [
+        {
+            "id": 1,
+            "module": "google-email:triggerWatchNewEmails",
+            "version": 4,
+            "parameters": {
+                "from": "jobalerts-noreply@linkedin.com",
+                "size": {
+                    "unit": "M",
+                    "amount": null,
+                    "criteria": "larger"
+                },
+                "limit": 1,
+                "folder": "INBOX",
+                "format": "full",
+                "subject": "",
+                "criteria": "is:unread",
+                "labelIds": "",
+                "markSeen": false,
+                "filterType": "simpleSearch",
+                "__IMTCONN__": 13266209,
+                "excludeWords": "",
+                "includeWords": "",
+                "hasAttachment": false
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "861605722f833d64"
+                },
+                "restore": {
+                    "parameters": {
+                        "size": {
+                            "nested": {
+                                "unit": {
+                                    "label": "MB (megabytes)"
+                                },
+                                "criteria": {
+                                    "label": "Greater than"
+                                }
+                            }
+                        },
+                        "folder": {
+                            "label": "Inbox"
+                        },
+                        "format": {
+                            "label": "Full content"
+                        },
+                        "criteria": {
+                            "label": "Only unread messages"
+                        },
+                        "labelIds": {
+                            "label": "Empty"
+                        },
+                        "filterType": {
+                            "label": "Simple filter"
+                        },
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google-email"
+                            },
+                            "label": "Rona's Gmail connectionronazeevi@gmail.com"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-email",
+                        "label": "Connection",
+                        "required": true
+                    },
+                    {
+                        "name": "filterType",
+                        "type": "select",
+                        "label": "Filter type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "simpleSearch",
+                                "gmailSearch"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "type": "select",
+                        "label": "Content format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "full",
+                                "raw",
+                                "metadata",
+                                "minimal"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "folder",
+                        "type": "select",
+                        "label": "Folder",
+                        "required": true
+                    },
+                    {
+                        "name": "labelIds",
+                        "type": "select",
+                        "label": "Label"
+                    },
+                    {
+                        "name": "criteria",
+                        "type": "select",
+                        "label": "Criteria",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "all",
+                                "is:read",
+                                "is:unread"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "markSeen",
+                        "type": "boolean",
+                        "label": "Mark email message(s) as read when fetched"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit",
+                        "required": true,
+                        "validate": {
+                            "max": 500
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "type": "email",
+                        "label": "Sender email address"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject"
+                    },
+                    {
+                        "name": "includeWords",
+                        "type": "text",
+                        "label": "Has the words"
+                    },
+                    {
+                        "name": "excludeWords",
+                        "type": "text",
+                        "label": "Doesn't have"
+                    },
+                    {
+                        "name": "size",
+                        "spec": [
+                            {
+                                "name": "criteria",
+                                "type": "select",
+                                "label": "Criteria",
+                                "validate": {
+                                    "enum": [
+                                        "larger",
+                                        "smaller"
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "amount",
+                                "type": "integer",
+                                "label": "Size",
+                                "validate": {
+                                    "min": 0
+                                }
+                            },
+                            {
+                                "name": "unit",
+                                "type": "select",
+                                "label": "Size unit",
+                                "validate": {
+                                    "enum": [
+                                        "M",
+                                        "K",
+                                        "bytes"
+                                    ]
+                                }
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Email size"
+                    },
+                    {
+                        "name": "hasAttachment",
+                        "type": "boolean",
+                        "label": "Only emails with attachments/media",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "Message ID"
+                    },
+                    {
+                        "name": "threadId",
+                        "type": "text",
+                        "label": "Thread ID"
+                    },
+                    {
+                        "name": "internalDate",
+                        "type": "date",
+                        "label": "Date"
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject",
+                        "condition": true
+                    },
+                    {
+                        "name": "fromName",
+                        "type": "text",
+                        "label": "From (name)",
+                        "condition": true
+                    },
+                    {
+                        "name": "fromEmail",
+                        "type": "text",
+                        "label": "From (email)",
+                        "condition": true
+                    },
+                    {
+                        "name": "to",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "name",
+                                    "type": "text",
+                                    "label": "Name"
+                                },
+                                {
+                                    "name": "email",
+                                    "type": "text",
+                                    "label": "Email"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "To",
+                        "condition": true
+                    },
+                    {
+                        "name": "cc",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "email",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "CC",
+                        "condition": true
+                    },
+                    {
+                        "name": "bcc",
+                        "spec": [
+                            {
+                                "name": "email",
+                                "type": "email",
+                                "label": "Email"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "BCC",
+                        "condition": true
+                    },
+                    {
+                        "name": "snippet",
+                        "type": "text",
+                        "label": "Snippet"
+                    },
+                    {
+                        "name": "fullTextBody",
+                        "type": "text",
+                        "label": "Full text body",
+                        "condition": true
+                    },
+                    {
+                        "name": "htmlBody",
+                        "type": "text",
+                        "label": "HTML body",
+                        "condition": true
+                    },
+                    {
+                        "name": "hasAttachment",
+                        "type": "boolean",
+                        "label": "Has attachment",
+                        "condition": true
+                    },
+                    {
+                        "name": "hasMedia",
+                        "type": "boolean",
+                        "label": "Has media",
+                        "condition": true
+                    },
+                    {
+                        "name": "sysFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "System folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "System folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "System folders"
+                    },
+                    {
+                        "name": "categoryFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "Category folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Category folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Category folders"
+                    },
+                    {
+                        "name": "userLabelFolders",
+                        "spec": [
+                            {
+                                "name": "id",
+                                "type": "text",
+                                "label": "User label folder ID"
+                            },
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "User label folder name"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "User label folders"
+                    },
+                    {
+                        "name": "labelIds",
+                        "spec": {
+                            "type": "text"
+                        },
+                        "type": "array",
+                        "label": "Message folder IDs"
+                    },
+                    {
+                        "name": "headers",
+                        "spec": [
+                            {
+                                "name": "Delivered-To",
+                                "type": "text",
+                                "label": "Delivered-To"
+                            },
+                            {
+                                "name": "Received",
+                                "type": "text",
+                                "label": "Received"
+                            },
+                            {
+                                "name": "Date",
+                                "type": "text",
+                                "label": "Date (header)"
+                            },
+                            {
+                                "name": "X-Original-Sender",
+                                "type": "text"
+                            },
+                            {
+                                "name": "Reply-To",
+                                "type": "text"
+                            },
+                            {
+                                "name": "Subject",
+                                "type": "text",
+                                "label": "Subject"
+                            },
+                            {
+                                "name": "From",
+                                "type": "text",
+                                "label": "From"
+                            },
+                            {
+                                "name": "To",
+                                "type": "text",
+                                "label": "To"
+                            },
+                            {
+                                "name": "Message-ID",
+                                "type": "text",
+                                "label": "Message-ID"
+                            },
+                            {
+                                "name": "In-Reply-To",
+                                "type": "text",
+                                "label": "In-Reply-To"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Headers",
+                        "condition": true
+                    },
+                    {
+                        "name": "sizeEstimate",
+                        "type": "number",
+                        "label": "Size estimate"
+                    },
+                    {
+                        "name": "historyId",
+                        "type": "text",
+                        "label": "History ID"
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 3,
+            "module": "ai-tools:Ask",
+            "version": 2,
+            "parameters": {
+                "model": "small",
+                "makeConnectionId": 13110044
+            },
+            "mapper": {
+                "input": "מתוך המייל הבא, חלץ את כל המשרות שמופיעות בו.\r\nהחזר אובייקט JSON יחיד בלבד, בלי טקסט נוסף, בלי Markdown ובלי בלוק ```.\r\nהפלט חייב להתחיל בתו { ולהסתיים בתו } — אסור להחזיר מערך שעוטף את האובייקט.\r\nהמבנה:\r\n{\"jobs\":[{\"title\":\"\",\"company\":\"\",\"location\":\"\",\"url\":\"\",\"role_type\":\"\",\"requirements\":\"\"}]}\r\nrole_type: אחד מ: פיתוח, דאטה, מוצר, QA, ניהול פרויקטים, אחר.\r\nאם שדה לא מופיע, השאר ריק.\r\n\r\nהמייל{{1.fullTextBody}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "model": {
+                            "mode": "chose",
+                            "label": "Small",
+                            "nested": []
+                        },
+                        "makeConnectionId": {
+                            "label": "Make's AI Provider (default)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "makeConnectionId",
+                        "type": "account:ai-provider,openai-gpt-3,anthropic-claude,gemini-ai-q9zyjp,ai-agent-foundry-openai,ai-agent-foundry-non-openai,mistral-ai,cohere,groq,ai-agent-xai,amazon-bedrock,ai-agent-openai-compatible",
+                        "label": "Connection",
+                        "required": true
+                    },
+                    {
+                        "name": "model",
+                        "type": "select",
+                        "label": "Model",
+                        "grouped": true,
+                        "mappable": true,
+                        "required": true,
+                        "forceReload": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "input",
+                        "type": "text",
+                        "label": "Text",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "module": "json:ParseJSON",
+            "version": 1,
+            "parameters": {
+                "type": 715863
+            },
+            "mapper": {
+                "json": "{{3.answer}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 0
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "8982f848cdb87f88"
+                },
+                "restore": {
+                    "parameters": {
+                        "type": {
+                            "label": "JOBS"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "udt",
+                        "label": "Data structure"
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "json",
+                        "type": "text",
+                        "label": "JSON string",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "help": "",
+                        "name": "jobs",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "title",
+                                    "type": "text"
+                                },
+                                {
+                                    "name": "company",
+                                    "type": "text"
+                                },
+                                {
+                                    "name": "location",
+                                    "type": "text"
+                                },
+                                {
+                                    "name": "url",
+                                    "type": "text"
+                                },
+                                {
+                                    "name": "role_type",
+                                    "type": "text"
+                                },
+                                {
+                                    "name": "requirements",
+                                    "type": "text"
+                                }
+                            ],
+                            "type": "collection"
+                        },
+                        "type": "array",
+                        "label": "Jobs"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 6,
+            "module": "google-drive:searchForFilesFolders",
+            "version": 4,
+            "parameters": {
+                "__IMTCONN__": 13305360
+            },
+            "filter": null,
+            "mapper": {
+                "limit": 3,
+                "query": "mimeType != 'application/vnd.google-apps.folder'",
+                "select": "list",
+                "folderId": "/1utiBZK0157KAFPHYOQ6dLy6bN3Cwq0rU",
+                "retrieve": "file",
+                "searchType": "custom",
+                "destination": "drive",
+                "searchScope": "limit"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "select": {
+                            "mode": "chose",
+                            "label": "Select from the list",
+                            "nested": [
+                                {
+                                    "name": "destination",
+                                    "type": "select",
+                                    "label": "Choose a Drive",
+                                    "options": [
+                                        {
+                                            "label": "My Drive",
+                                            "value": "drive",
+                                            "nested": [
+                                                {
+                                                    "help": "Whether you want to search everywhere or to only include files or folders directly inside the selected folder. Defaults to the root folder if no folder is chosen.",
+                                                    "name": "searchScope",
+                                                    "type": "select",
+                                                    "label": "Search Scope",
+                                                    "default": "limit",
+                                                    "options": [
+                                                        {
+                                                            "label": "Search everywhere",
+                                                            "value": "everywhere"
+                                                        },
+                                                        {
+                                                            "label": "Limit to the chosen folder",
+                                                            "value": "limit",
+                                                            "nested": [
+                                                                {
+                                                                    "name": "folderId",
+                                                                    "type": "folder",
+                                                                    "label": "Choose a Folder",
+                                                                    "options": {
+                                                                        "ids": true,
+                                                                        "store": "rpc://google-drive@4/listFolders"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "mappable": false,
+                                                    "required": true
+                                                }
+                                            ],
+                                            "default": true
+                                        },
+                                        {
+                                            "label": "Shared With Me",
+                                            "value": "share",
+                                            "nested": [
+                                                {
+                                                    "name": "folderId",
+                                                    "type": "folder",
+                                                    "label": "Choose a Folder",
+                                                    "options": {
+                                                        "ids": true,
+                                                        "store": "rpc://google-drive@4/listFolders?share=true",
+                                                        "showRoot": false
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "label": "Google Shared Drive",
+                                            "value": "team",
+                                            "nested": [
+                                                {
+                                                    "help": "Issue the request as a domain administrator\nIf set to `Yes`, then all shared drives of the domain in which the requester is an administrator are returned.",
+                                                    "name": "useDomainAdminAccess",
+                                                    "type": "select",
+                                                    "label": "Use Domain Admin Access",
+                                                    "options": {
+                                                        "store": [
+                                                            {
+                                                                "label": "Yes",
+                                                                "value": true
+                                                            },
+                                                            {
+                                                                "label": "No",
+                                                                "value": false,
+                                                                "default": true
+                                                            }
+                                                        ],
+                                                        "nested": [
+                                                            {
+                                                                "name": "sharedDrive",
+                                                                "type": "select",
+                                                                "label": "Shared Drive",
+                                                                "options": {
+                                                                    "store": "rpc://google-drive@4/listSharedDrives",
+                                                                    "nested": [
+                                                                        {
+                                                                            "help": "Whether you want to search everywhere or to only include files or folders directly inside the selected folder. Defaults to the root folder if no folder is chosen.",
+                                                                            "name": "searchScope",
+                                                                            "type": "select",
+                                                                            "label": "Search Scope",
+                                                                            "default": "limit",
+                                                                            "options": [
+                                                                                {
+                                                                                    "label": "Search everywhere",
+                                                                                    "value": "everywhere"
+                                                                                },
+                                                                                {
+                                                                                    "label": "Limit to the chosen folder",
+                                                                                    "value": "limit",
+                                                                                    "nested": [
+                                                                                        {
+                                                                                            "name": "folderId",
+                                                                                            "type": "folder",
+                                                                                            "label": "Choose a Folder",
+                                                                                            "options": {
+                                                                                                "ids": true,
+                                                                                                "store": "rpc://google-drive@4/listTeamFolders"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ],
+                                                                            "mappable": false,
+                                                                            "required": true
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "mappable": false,
+                                                                "required": true
+                                                            }
+                                                        ]
+                                                    },
+                                                    "mappable": false,
+                                                    "required": true
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "mappable": false,
+                                    "required": true
+                                }
+                            ]
+                        },
+                        "folderId": {
+                            "mode": "chose",
+                            "path": []
+                        },
+                        "retrieve": {
+                            "mode": "chose",
+                            "label": "Files"
+                        },
+                        "searchType": {
+                            "mode": "chose",
+                            "label": "Enter custom search query",
+                            "nested": [
+                                {
+                                    "name": "query",
+                                    "type": "text",
+                                    "label": "Query",
+                                    "required": true
+                                }
+                            ]
+                        },
+                        "destination": {
+                            "mode": "chose",
+                            "label": "My Drive",
+                            "nested": [
+                                {
+                                    "help": "Whether you want to search everywhere or to only include files or folders directly inside the selected folder. Defaults to the root folder if no folder is chosen.",
+                                    "name": "searchScope",
+                                    "type": "select",
+                                    "label": "Search Scope",
+                                    "default": "limit",
+                                    "options": [
+                                        {
+                                            "label": "Search everywhere",
+                                            "value": "everywhere"
+                                        },
+                                        {
+                                            "label": "Limit to the chosen folder",
+                                            "value": "limit",
+                                            "nested": [
+                                                {
+                                                    "name": "folderId",
+                                                    "type": "folder",
+                                                    "label": "Choose a Folder",
+                                                    "options": {
+                                                        "ids": true,
+                                                        "store": "rpc://google-drive@4/listFolders"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "mappable": false,
+                                    "required": true
+                                }
+                            ]
+                        },
+                        "searchScope": {
+                            "mode": "chose",
+                            "label": "Limit to the chosen folder",
+                            "nested": [
+                                {
+                                    "name": "folderId",
+                                    "type": "folder",
+                                    "label": "Choose a Folder",
+                                    "options": {
+                                        "ids": true,
+                                        "store": "rpc://google-drive@4/listFolders"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "Rona's Google Drive connection"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-restricted,google-drive",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "select",
+                        "type": "select",
+                        "label": "Select the Method",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "map",
+                                "list"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "destination",
+                        "type": "select",
+                        "label": "Choose a Drive",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "drive",
+                                "share",
+                                "team"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "searchScope",
+                        "type": "select",
+                        "label": "Search Scope",
+                        "default": "limit",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "everywhere",
+                                "limit"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "folderId",
+                        "type": "folder",
+                        "label": "Choose a Folder"
+                    },
+                    {
+                        "name": "retrieve",
+                        "type": "select",
+                        "label": "Retrieve",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "file",
+                                "folder",
+                                "file_folder"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "searchType",
+                        "type": "select",
+                        "label": "Search",
+                        "mappable": false,
+                        "validate": {
+                            "enum": [
+                                "title",
+                                "fulltext",
+                                "custom"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "type": "text",
+                        "label": "Query",
+                        "required": true
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit",
+                        "default": 10
+                    }
+                ]
+            }
+        },
+        {
+            "id": 7,
+            "module": "google-drive:getAFile",
+            "version": 4,
+            "parameters": {
+                "__IMTCONN__": 13305360
+            },
+            "filter": null,
+            "mapper": {
+                "file": "{{6.id}}",
+                "select": "map",
+                "formatDrawings": "application/pdf",
+                "formatDocuments": "text/plain",
+                "formatSpreadsheets": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "formatPresentations": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1200,
+                    "y": 0,
+                    "name": "Download File"
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "9afda959bb6166b"
+                },
+                "restore": {
+                    "expect": {
+                        "select": {
+                            "label": "Enter manually"
+                        },
+                        "formatDrawings": {
+                            "label": "PDF"
+                        },
+                        "formatDocuments": {
+                            "label": "Text (txt)"
+                        },
+                        "formatSpreadsheets": {
+                            "label": "MS Excel"
+                        },
+                        "formatPresentations": {
+                            "label": "MS PowerPoint"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google-drive"
+                            },
+                            "label": "Rona's Google Drive connectionronazeevi@gmail.com"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-restricted,google-drive",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "select",
+                        "type": "select",
+                        "label": "Enter a File ID",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "map",
+                                "value"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "formatDocuments",
+                        "type": "select",
+                        "label": "Convert Google Documents Files to Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                "application/pdf",
+                                "application/vnd.oasis.opendocument.text",
+                                "text/html",
+                                "text/plain",
+                                "application/rtf",
+                                "text/markdown"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "formatSpreadsheets",
+                        "type": "select",
+                        "label": "Convert Google Spreadsheets Files to Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                "application/x-vnd.oasis.opendocument.spreadsheet",
+                                "application/pdf",
+                                "text/csv"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "formatPresentations",
+                        "type": "select",
+                        "label": "Convert Google Slides Files to Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                                "application/pdf"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "formatDrawings",
+                        "type": "select",
+                        "label": "Convert Google Drawings Files to Format",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "image/jpeg",
+                                "image/png",
+                                "image/svg+xml",
+                                "application/pdf"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "type": "text",
+                        "label": "File ID",
+                        "required": true
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 8,
+            "module": "util:TextAggregator",
+            "version": 1,
+            "parameters": {
+                "feeder": 6,
+                "rowSeparator": "\n"
+            },
+            "filter": null,
+            "mapper": {
+                "value": "{{toString(7.data)}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1500,
+                    "y": 0,
+                    "name": "Aggregate Text"
+                },
+                "restore": {
+                    "parameters": {
+                        "rowSeparator": {
+                            "mode": "chose",
+                            "label": "New row"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "rowSeparator",
+                        "type": "select",
+                        "label": "Row separator",
+                        "advanced": true,
+                        "required": false,
+                        "validate": {
+                            "enum": [
+                                "\n",
+                                "\t",
+                                "other"
+                            ]
+                        }
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "value",
+                        "type": "text",
+                        "label": "Text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 9,
+            "module": "ai-tools:Ask",
+            "version": 2,
+            "parameters": {
+                "model": "small",
+                "makeConnectionId": 13110044
+            },
+            "filter": null,
+            "mapper": {
+                "input": "אתה כותב קורות חיים מקצועי. כתוב קורות חיים בעברית, מותאמים למשרה, רק על סמך החומר שסופק. אל תמציא ניסיון, תארים או כישורים.\r\n\r\nכללים:\r\n* bullets בגוף ראשון ובזמן עבר (הובלתי, אפיינתי, ניתחתי), 3 עד 4 לכל תפקיד.\r\n* תקציר של 2 עד 3 שורות, בלי שם המשרה או החברה.\r\n* ניסיון מלפני 2015 מרוכז בתפקיד אחד עם 2 bullets לכל היותר.\r\n* בלי LinkedIn, בלי \"לא סופק\", בלי הערות או הסברים. עמוד אחד. בדוק כתיב.\r\n\r\nהחזר HTML בלבד, בלי Markdown ובלי ```. העתק בדיוק את המבנה הבא ומלא את התוכן במקום הסוגריים המרובעים. אל תכתוב שום טקסט שאינו חלק מקורות החיים:\r\n\r\n<div dir=\"rtl\" style=\"font-family:Arial;direction:rtl;text-align:right;\">\r\n<h1 style=\"font-size:24pt;color:#1F3864;margin:0;\">רונה זאבי גלילי</h1>\r\n<p style=\"font-size:10pt;color:#595959;\">מודיעין | 053-7534341 | ronazeevi@gmail.com</p>\r\n<h2 style=\"font-size:13pt;color:#1F3864;border-bottom:1px solid #1F3864;\">תקציר</h2>\r\n<p style=\"font-size:10.5pt;\">[תקציר]</p>\r\n<h2 style=\"font-size:13pt;color:#1F3864;border-bottom:1px solid #1F3864;\">ניסיון מקצועי</h2>\r\n<p><b>[תפקיד] | [חברה]</b> <span style=\"color:#595959;\">[שנים]</span></p>\r\n<ul style=\"font-size:10.5pt;\"><li>[הישג]</li></ul>\r\n(חזור על התפקיד וה-ul לכל תפקיד)\r\n<h2 style=\"font-size:13pt;color:#1F3864;border-bottom:1px solid #1F3864;\">השכלה</h2>\r\n<p style=\"font-size:10.5pt;\">[השכלה]</p>\r\n<h2 style=\"font-size:13pt;color:#1F3864;border-bottom:1px solid #1F3864;\">כישורים</h2>\r\n<p style=\"font-size:10.5pt;\">[כישור • כישור • כישור]</p>\r\n</div>\r\nהמשרה: {{4.jobs[].title}} ב-{{4.jobs[].company}}\nדרישות: {{4.jobs[].requirements}}\nהחומר שלי:\n{{8.text}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1800,
+                    "y": 0,
+                    "name": "Generate Resume"
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "7e42c6e3bdab5572"
+                },
+                "restore": {
+                    "parameters": {
+                        "model": {
+                            "mode": "chose",
+                            "label": "SmallModel: gpt-5-nano. Reasoning: minimal. Efficiently handles long conversations and reasoning, delivering smart conclusions quickly",
+                            "nested": []
+                        },
+                        "makeConnectionId": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "ai-provider"
+                            },
+                            "label": "Make's AI Provider (default)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "makeConnectionId",
+                        "type": "account:ai-provider,openai-gpt-3,anthropic-claude,gemini-ai-q9zyjp,ai-agent-foundry-openai,ai-agent-foundry-non-openai,mistral-ai,cohere,groq,ai-agent-xai,amazon-bedrock,ai-agent-openai-compatible",
+                        "label": "Connection",
+                        "required": true
+                    },
+                    {
+                        "name": "model",
+                        "type": "select",
+                        "label": "Model",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "input",
+                        "type": "text",
+                        "label": "Text",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 10,
+            "module": "google-docs:createADocument",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 13273546
+            },
+            "filter": null,
+            "mapper": {
+                "name": "קו\"ח - {{4.jobs[].company}} - {{4.jobs[].title}}",
+                "footer": false,
+                "header": false,
+                "content": "{{9.answer}}",
+                "folderId": "/1bIa3L-2HMQjE1HSib8RKiD5lg3cyYJcw/1qFh-MZ6Mgq5wEQ1iAMKoarJfjaH2fWy-/1AHJ4esTgA3LvLMug500KWFc5RUeg0i6V",
+                "destination": "drive"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 2100,
+                    "y": 0,
+                    "name": "Create Resume Doc"
+                },
+                "restore": {
+                    "expect": {
+                        "folderId": {
+                            "mode": "chose",
+                            "path": [
+                                "חיפוש עבודה ",
+                                "קורות חיים ",
+                                "new cv"
+                            ]
+                        },
+                        "destination": {
+                            "mode": "chose",
+                            "label": "My Drive",
+                            "nested": [
+                                {
+                                    "help": "The folder, where the new document should be placed.",
+                                    "name": "folderId",
+                                    "type": "folder",
+                                    "label": "New Document's Location",
+                                    "options": {
+                                        "ids": true,
+                                        "store": "rpc://google-docs@1/listFolders"
+                                    },
+                                    "required": true
+                                }
+                            ]
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "Rona's Google connection"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "name",
+                        "type": "text",
+                        "label": "Name",
+                        "required": true
+                    },
+                    {
+                        "name": "content",
+                        "type": "text",
+                        "label": "Content",
+                        "required": true
+                    },
+                    {
+                        "name": "destination",
+                        "type": "select",
+                        "label": "Choose a Drive",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "drive",
+                                "share",
+                                "team"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "folderId",
+                        "type": "folder",
+                        "label": "New Document's Location",
+                        "required": true
+                    },
+                    {
+                        "name": "header",
+                        "type": "boolean",
+                        "label": "Insert a Header",
+                        "advanced": true,
+                        "mappable": false,
+                        "required": true
+                    },
+                    {
+                        "name": "footer",
+                        "type": "boolean",
+                        "label": "Insert a Footer",
+                        "advanced": true,
+                        "mappable": false,
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "module": "google-sheets:addRow",
+            "version": 2,
+            "parameters": {
+                "__IMTCONN__": 13273546
+            },
+            "mapper": {
+                "mode": "fromAll",
+                "values": {
+                    "חברה": "{{4.jobs[].company}}",
+                    "סטטוס": "חדש",
+                    "תאריך": "{{now}}",
+                    "תפקיד": "{{4.jobs[].title}}",
+                    " מיקום": "{{4.jobs[].location}}",
+                    "דרישות": "{{4.jobs[].requirements}}",
+                    "סוג תפקיד": "{{4.jobs[].role_type}}",
+                    "קורות חיים ": "{{10.name}}",
+                    "קישור למשרה": "{{4.jobs[].url}}"
+                },
+                "sheetId": "גיליון1",
+                "spreadsheetId": "1gmoXwS9V2cAwebSDM5gYIlfh2GvfY4QdhK7B6oIIWZQ",
+                "includesHeaders": true,
+                "insertDataOption": "INSERT_ROWS",
+                "useColumnHeaders": true,
+                "valueInputOption": "USER_ENTERED",
+                "insertUnformatted": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 2400,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "mode": {
+                            "mode": "chose",
+                            "label": "Select from all",
+                            "nested": [
+                                {
+                                    "rpc": {
+                                        "url": "rpc://google-sheets@2/rpcSpreadsheet",
+                                        "label": "ID Finder",
+                                        "parameters": [
+                                            {
+                                                "help": "Leave the field empty to display all files. Enter the filename or its part(s).",
+                                                "name": "spreadsheetName",
+                                                "type": "text",
+                                                "label": "Filename Keywords"
+                                            },
+                                            {
+                                                "name": "enableSharedDrives",
+                                                "type": "boolean",
+                                                "label": "Search in Shared Drives",
+                                                "nested": [
+                                                    {
+                                                        "help": "Must have **domain administrator** access.\nIf set to `Yes`, all shared drives will be searched for results.",
+                                                        "name": "useDomainAdminAccess",
+                                                        "type": "select",
+                                                        "label": "Use Domain Admin Access",
+                                                        "options": {
+                                                            "store": [
+                                                                {
+                                                                    "label": "Yes",
+                                                                    "value": true
+                                                                },
+                                                                {
+                                                                    "label": "No",
+                                                                    "value": false,
+                                                                    "default": true
+                                                                }
+                                                            ],
+                                                            "nested": [
+                                                                {
+                                                                    "name": "drive",
+                                                                    "type": "select",
+                                                                    "label": "Shared Drive",
+                                                                    "options": "rpc://google-sheets@2/listSharedDrives",
+                                                                    "required": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        "mappable": false,
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "default": false,
+                                                "required": true
+                                            }
+                                        ]
+                                    },
+                                    "help": "Find the Spreadsheet ID by clicking **ID Finder** .\ne.g. 1a1ADVruoa0YztkOpKM6BWXIYO9GWaA",
+                                    "name": "spreadsheetId",
+                                    "type": "text",
+                                    "label": "Spreadsheet ID",
+                                    "nested": [
+                                        {
+                                            "name": "sheetId",
+                                            "type": "select",
+                                            "label": "Sheet Name",
+                                            "options": {
+                                                "store": "rpc://google-sheets@2/rpcSheet",
+                                                "nested": [
+                                                    {
+                                                        "name": "includesHeaders",
+                                                        "type": "select",
+                                                        "label": "Table contains headers",
+                                                        "default": true,
+                                                        "options": [
+                                                            {
+                                                                "label": "Yes",
+                                                                "value": true,
+                                                                "nested": [
+                                                                    {
+                                                                        "help": "When enabled, column headers are used as IDs. This allows the module to continue working even if new columns are inserted into the table, without needing to remap values.",
+                                                                        "name": "useColumnHeaders",
+                                                                        "type": "select",
+                                                                        "label": "Use column headers as IDs of the columns",
+                                                                        "nested": [
+                                                                            "rpc://google-sheets@2/rpcSheetInput"
+                                                                        ],
+                                                                        "default": false,
+                                                                        "options": [
+                                                                            {
+                                                                                "label": "Yes",
+                                                                                "value": true
+                                                                            },
+                                                                            {
+                                                                                "label": "No",
+                                                                                "value": false
+                                                                            }
+                                                                        ],
+                                                                        "mappable": false,
+                                                                        "required": true
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "label": "No",
+                                                                "value": false,
+                                                                "nested": [
+                                                                    {
+                                                                        "help": "Please select the column range you want to work with.",
+                                                                        "name": "tableFirstRow",
+                                                                        "type": "select",
+                                                                        "label": "Column range",
+                                                                        "options": [
+                                                                            {
+                                                                                "label": "A-Z",
+                                                                                "value": "A1:Z1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            },
+                                                                            {
+                                                                                "label": "A-BZ",
+                                                                                "value": "A1:BZ1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            },
+                                                                            {
+                                                                                "label": "A-CZ",
+                                                                                "value": "A1:CZ1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            },
+                                                                            {
+                                                                                "label": "A-DZ",
+                                                                                "value": "A1:DZ1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            },
+                                                                            {
+                                                                                "label": "A-MZ",
+                                                                                "value": "A1:MZ1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            },
+                                                                            {
+                                                                                "label": "A-ZZ",
+                                                                                "value": "A1:ZZ1",
+                                                                                "nested": "rpc://google-sheets@2/rpcSheetInput"
+                                                                            }
+                                                                        ],
+                                                                        "mappable": false,
+                                                                        "required": true
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "mappable": false,
+                                                        "required": true
+                                                    }
+                                                ]
+                                            },
+                                            "required": true
+                                        }
+                                    ],
+                                    "required": true
+                                }
+                            ]
+                        },
+                        "sheetId": {
+                            "mode": "chose",
+                            "label": "גיליון1"
+                        },
+                        "includesHeaders": {
+                            "mode": "chose",
+                            "label": "Yes",
+                            "nested": [
+                                {
+                                    "help": "When enabled, column headers are used as IDs. This allows the module to continue working even if new columns are inserted into the table, without needing to remap values.",
+                                    "name": "useColumnHeaders",
+                                    "type": "select",
+                                    "label": "Use column headers as IDs of the columns",
+                                    "nested": [
+                                        "rpc://google-sheets@2/rpcSheetInput"
+                                    ],
+                                    "default": false,
+                                    "options": [
+                                        {
+                                            "label": "Yes",
+                                            "value": true
+                                        },
+                                        {
+                                            "label": "No",
+                                            "value": false
+                                        }
+                                    ],
+                                    "mappable": false,
+                                    "required": true
+                                }
+                            ]
+                        },
+                        "insertDataOption": {
+                            "mode": "chose",
+                            "label": "Insert rows"
+                        },
+                        "useColumnHeaders": {
+                            "mode": "chose",
+                            "label": "Yes"
+                        },
+                        "valueInputOption": {
+                            "mode": "chose",
+                            "label": "User entered"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "Rona's Google connection"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "mode",
+                        "type": "select",
+                        "label": "Search Method",
+                        "default": "select",
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "select",
+                                "fromAll",
+                                "map"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "spreadsheetId",
+                        "type": "text",
+                        "label": "Spreadsheet ID",
+                        "required": true
+                    },
+                    {
+                        "name": "sheetId",
+                        "type": "select",
+                        "label": "Sheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "includesHeaders",
+                        "type": "select",
+                        "label": "Table contains headers",
+                        "default": true,
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "useColumnHeaders",
+                        "type": "select",
+                        "label": "Use column headers as IDs of the columns",
+                        "default": false,
+                        "mappable": false,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "true",
+                                "false"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "values",
+                        "spec": [
+                            {
+                                "name": "תפקיד",
+                                "type": "text",
+                                "label": "תפקיד (A)"
+                            },
+                            {
+                                "name": "חברה",
+                                "type": "text",
+                                "label": "חברה (B)"
+                            },
+                            {
+                                "name": " מיקום",
+                                "type": "text",
+                                "label": "מיקום (C)"
+                            },
+                            {
+                                "name": "סוג תפקיד",
+                                "type": "text",
+                                "label": "סוג תפקיד (D)"
+                            },
+                            {
+                                "name": "קישור למשרה",
+                                "type": "text",
+                                "label": "קישור למשרה (E)"
+                            },
+                            {
+                                "name": "דרישות",
+                                "type": "text",
+                                "label": "דרישות (F)"
+                            },
+                            {
+                                "name": "סטטוס",
+                                "type": "text",
+                                "label": "סטטוס (G)"
+                            },
+                            {
+                                "name": "תאריך",
+                                "type": "text",
+                                "label": "תאריך (H)"
+                            },
+                            {
+                                "name": "קורות חיים ",
+                                "type": "text",
+                                "label": "קורות חיים  (I)"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Values in columns",
+                        "metadata": [
+                            [
+                                [
+                                    "תפקיד",
+                                    "חברה",
+                                    " מיקום",
+                                    "סוג תפקיד",
+                                    "קישור למשרה",
+                                    "דרישות",
+                                    "סטטוס",
+                                    "תאריך",
+                                    "קורות חיים "
+                                ]
+                            ]
+                        ]
+                    },
+                    {
+                        "name": "insertUnformatted",
+                        "type": "boolean",
+                        "label": "Unformatted",
+                        "default": false,
+                        "required": true
+                    },
+                    {
+                        "name": "valueInputOption",
+                        "type": "select",
+                        "label": "Value input option",
+                        "default": "USER_ENTERED",
+                        "advanced": true,
+                        "editable": true,
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "USER_ENTERED",
+                                "RAW"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "insertDataOption",
+                        "type": "select",
+                        "label": "Insert data option",
+                        "default": "INSERT_ROWS",
+                        "advanced": true,
+                        "editable": true,
+                        "validate": {
+                            "enum": [
+                                "INSERT_ROWS",
+                                "OVERWRITE"
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu1.make.com",
+        "notes": []
+    }
+}
