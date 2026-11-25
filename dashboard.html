@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>דשבורד חיפוש עבודה</title>
+<style>
+  :root {
+    --bg: #F4F6FA; --card: #FFFFFF; --ink: #1B2333; --muted: #6B7385; --line: #E4E8F0;
+    --brand: #1F3864; --c1: #4C78A8; --c2: #F58518; --c3: #54A24B; --c4: #E45756; --c5: #72B7B2; --c6: #B279A2; --c7: #9D755D;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+  header { background: var(--brand); color: #fff; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header span { opacity: .8; font-size: 13px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 22px 16px 40px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi, .card { background: var(--card); border-radius: 14px; box-shadow: 0 1px 3px rgba(20,30,60,.08); }
+  .kpi { padding: 16px 18px; }
+  .kpi .v { font-size: 30px; font-weight: 700; color: var(--brand); }
+  .kpi .l { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .card { padding: 16px 18px; }
+  .card h2 { margin: 0 0 10px; font-size: 15px; }
+  .pie { display: flex; align-items: center; gap: 16px; }
+  .pie svg { flex: none; }
+  .legend { list-style: none; margin: 0; padding: 0; font-size: 13px; flex: 1; min-width: 0; }
+  .legend li { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .legend .n { margin-inline-start: auto; font-weight: 600; }
+  .legend .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jobs { margin-top: 14px; }
+  .bar { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px; }
+  .bar input, .bar select { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 14px; }
+  .bar input { width: 240px; max-width: 100%; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: right; color: var(--muted); font-weight: 600; font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:hover td { background: #FAFBFD; }
+  td.title { font-weight: 600; }
+  td.small { color: var(--muted); white-space: nowrap; }
+  a { color: var(--c1); text-decoration: none; }
+  select.status { border: 0; border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .s-חדש { background: #E8EAED; color: #3C4043; }
+  .s-הוגש { background: #D2E3FC; color: #174EA6; }
+  .s-ראיון { background: #FEEFC3; color: #7A5B00; }
+  .s-נדחה { background: #FAD2CF; color: #A50E0E; }
+  .s-הצעה { background: #CEEAD6; color: #0D652D; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 9px 16px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; }
+  .toast.on { opacity: 1; }
+  .loading { text-align: center; color: var(--muted); padding: 60px 0; }
+  @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>דשבורד חיפוש עבודה</h1>
+  <span id="updated">טוען נתונים…</span>
+</header>
+<main>
+  <div id="app" class="loading">טוען נתונים מהגיליון…</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+var STATUSES = ['חדש', 'הוגש', 'ראיון', 'נדחה', 'הצעה'];
+var STATUS_COLORS = { 'חדש': '#9AA0A6', 'הוגש': '#4C78A8', 'ראיון': '#F2B701', 'נדחה': '#E45756', 'הצעה': '#54A24B' };
+var PALETTE = ['#4C78A8', '#F58518', '#54A24B', '#E45756', '#72B7B2', '#B279A2', '#9D755D', '#BAB0AC'];
+var jobs = [];
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+function countBy(list, key) {
+  var m = {};
+  list.forEach(function (j) { var k = j[key] || 'לא צוין'; m[k] = (m[k] || 0) + 1; });
+  return Object.keys(m).map(function (k) { return [k, m[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+}
+
+function donut(pairs, colors) {
+  var total = pairs.reduce(function (s, p) { return s + p[1]; }, 0);
+  var r = 52, c = 2 * Math.PI * r, off = 0, segs = '';
+  pairs.forEach(function (p, i) {
+    if (!p[1]) return;
+    var len = c * p[1] / total;
+    segs += '<circle r="' + r + '" cx="70" cy="70" fill="none" stroke="' + colors(p[0], i) + '" stroke-width="22" stroke-dasharray="' + len + ' ' + (c - len) + '" stroke-dashoffset="' + (-off) + '"></circle>';
+    off += len;
+  });
+  if (!total) segs = '<circle r="' + r + '" cx="70" cy="70" fill="none" stroke="#E4E8F0" stroke-width="22"></circle>';
+  var svg = '<svg width="140" height="140" viewBox="0 0 140 140"><g transform="rotate(-90 70 70)">' + segs + '</g>' +
+    '<text x="70" y="68" text-anchor="middle" font-size="24" font-weight="700" fill="#1F3864">' + total + '</text>' +
+    '<text x="70" y="88" text-anchor="middle" font-size="11" fill="#6B7385">סה"כ</text></svg>';
+  var legend = '<ul class="legend">' + pairs.map(function (p, i) {
+    return '<li><i style="background:' + colors(p[0], i) + '"></i><span class="t" title="' + esc(p[0]) + '">' + esc(p[0]) + '</span><span class="n">' + p[1] + '</span></li>';
+  }).join('') + '</ul>';
+  return '<div class="pie">' + svg + legend + '</div>';
+}
+
+function render() {
+  var total = jobs.length;
+  var withCv = jobs.filter(function (j) { return j.cv; }).length;
+  var submitted = jobs.filter(function (j) { return j.status && j.status !== 'חדש'; }).length;
+  var interviews = jobs.filter(function (j) { return j.status === 'ראיון' || j.status === 'הצעה'; }).length;
+
+  var statusPairs = STATUSES.map(function (s) { return [s, jobs.filter(function (j) { return (j.status || 'חדש') === s; }).length]; });
+  var cvPairs = [['הוגשו', submitted], ['נוצרו, טרם הוגשו', Math.max(withCv - submitted, 0)], ['ללא קו"ח', Math.max(total - withCv, 0)]];
+  var cvColors = { 'הוגשו': '#54A24B', 'נוצרו, טרם הוגשו': '#4C78A8', 'ללא קו"ח': '#BAB0AC' };
+
+  var html =
+    '<section class="kpis">' +
+      kpi(total, 'משרות שנמצאו') + kpi(withCv, 'קורות חיים שנוצרו') + kpi(submitted, 'קורות חיים שהוגשו') + kpi(interviews, 'ראיונות והצעות') +
+    '</section>' +
+    '<section class="charts">' +
+      '<div class="card"><h2>משרות לפי סוג תפקיד</h2>' + donut(countBy(jobs, 'roleType'), function (k, i) { return PALETTE[i % PALETTE.length]; }) + '</div>' +
+      '<div class="card"><h2>משרות לפי סטטוס</h2>' + donut(statusPairs, function (k) { return STATUS_COLORS[k]; }) + '</div>' +
+      '<div class="card"><h2>קורות חיים</h2>' + donut(cvPairs, function (k) { return cvColors[k]; }) + '</div>' +
+    '</section>' +
+    '<section class="card jobs">' +
+      '<div class="bar"><h2 style="margin:0">כל המשרות</h2>' +
+        '<div><input id="q" placeholder="חיפוש תפקיד או חברה" oninput="drawRows()"> ' +
+        '<select id="f" onchange="drawRows()"><option value="">כל הסטטוסים</option>' + STATUSES.map(function (s) { return '<option>' + s + '</option>'; }).join('') + '</select></div>' +
+      '</div>' +
+      '<div class="tablewrap"><table><thead><tr><th>תפקיד</th><th>חברה</th><th>סוג תפקיד</th><th>מיקום</th><th>תאריך</th><th>משרה</th><th>קו"ח</th><th>סטטוס</th></tr></thead>' +
+      '<tbody id="rows"></tbody></table></div>' +
+    '</section>';
+
+  var q = document.getElementById('q'), f = document.getElementById('f');
+  var keep = { q: q ? q.value : '', f: f ? f.value : '' };
+  var app = document.getElementById('app');
+  app.className = '';
+  app.innerHTML = html;
+  document.getElementById('q').value = keep.q;
+  document.getElementById('f').value = keep.f;
+  drawRows();
+}
+
+function kpi(v, l) { return '<div class="kpi"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>'; }
+
+function drawRows() {
+  var q = document.getElementById('q').value.trim().toLowerCase();
+  var f = document.getElementById('f').value;
+  var list = jobs.filter(function (j) {
+    return (!f || (j.status || 'חדש') === f) &&
+      (!q || (j.title + ' ' + j.company).toLowerCase().indexOf(q) >= 0);
+  });
+  document.getElementById('rows').innerHTML = list.map(function (j) {
+    var st = j.status || 'חדש';
+    return '<tr>' +
+      '<td class="title">' + esc(j.title) + '</td>' +
+      '<td>' + esc(j.company) + '</td>' +
+      '<td class="small">' + esc(j.roleType) + '</td>' +
+      '<td class="small">' + esc(j.location) + '</td>' +
+      '<td class="small">' + esc(j.date) + '</td>' +
+      '<td>' + (j.url ? '<a href="' + esc(j.url) + '" target="_blank" rel="noopener">פתיחה ↗</a>' : '') + '</td>' +
+      '<td class="small">' + (j.cv ? '✓' : '') + '</td>' +
+      '<td><select class="status s-' + st + '" onchange="changeStatus(' + j.row + ', this)">' +
+        STATUSES.map(function (s) { return '<option' + (s === st ? ' selected' : '') + '>' + s + '</option>'; }).join('') +
+      '</select></td>' +
+    '</tr>';
+  }).join('') || '<tr><td colspan="8" class="small" style="text-align:center;padding:24px">אין משרות להצגה</td></tr>';
+}
+
+function changeStatus(row, el) {
+  var value = el.value;
+  el.className = 'status s-' + value;
+  el.disabled = true;
+  google.script.run
+    .withSuccessHandler(function () {
+      jobs.forEach(function (j) { if (j.row === row) j.status = value; });
+      toast('הסטטוס עודכן בגיליון');
+      render();
+    })
+    .withFailureHandler(function (e) { el.disabled = false; toast('שגיאה בעדכון: ' + e.message); })
+    .setJobStatus(row, value);
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast on';
+  setTimeout(function () { t.className = 'toast'; }, 2200);
+}
+
+function load() {
+  google.script.run
+    .withSuccessHandler(function (data) {
+      jobs = data;
+      document.getElementById('updated').textContent = 'עודכן: ' + new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+      render();
+    })
+    .withFailureHandler(function (e) { document.getElementById('app').textContent = 'שגיאה בטעינה: ' + e.message; })
+    .getJobs();
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>
