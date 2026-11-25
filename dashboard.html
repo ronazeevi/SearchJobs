@@ -14,6 +14,10 @@
   header { background: var(--brand); color: #fff; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   header h1 { margin: 0; font-size: 22px; }
   header span { opacity: .8; font-size: 13px; }
+  .hright { display: flex; align-items: center; gap: 14px; }
+  .run { background: #fff; color: var(--brand); border: 0; border-radius: 999px; padding: 9px 18px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+  .run:hover { background: #E8EEF9; }
+  .run:disabled { opacity: .7; cursor: wait; }
   main { max-width: 1200px; margin: 0 auto; padding: 22px 16px 40px; }
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .kpi, .card { background: var(--card); border-radius: 14px; box-shadow: 0 1px 3px rgba(20,30,60,.08); }
@@ -57,7 +61,10 @@
 <body>
 <header>
   <h1>דשבורד חיפוש עבודה</h1>
-  <span id="updated">טוען נתונים…</span>
+  <div class="hright">
+    <span id="updated">טוען נתונים…</span>
+    <button class="run" id="runBtn" onclick="runProcess()">▶ הפעלת התהליך</button>
+  </div>
 </header>
 <main>
   <div id="app" class="loading">טוען נתונים מהגיליון…</div>
@@ -175,10 +182,27 @@ function changeStatus(row, el) {
     .setJobStatus(row, value);
 }
 
-function toast(msg) {
+function runProcess() {
+  var b = document.getElementById('runBtn');
+  b.disabled = true; b.textContent = '⏳ מפעיל…';
+  google.script.run
+    .withSuccessHandler(function () {
+      toast('התהליך הופעל ב-Make. משרות חדשות יופיעו כאן תוך דקה-שתיים');
+      b.textContent = '⏳ התהליך רץ…';
+      [30000, 60000, 120000].forEach(function (ms) { setTimeout(load, ms); });
+      setTimeout(function () { b.disabled = false; b.textContent = '▶ הפעלת התהליך'; }, 120000);
+    })
+    .withFailureHandler(function (e) {
+      b.disabled = false; b.textContent = '▶ הפעלת התהליך';
+      toast('לא הצלחתי להפעיל: ' + e.message, 6000);
+    })
+    .runMakeScenario();
+}
+
+function toast(msg, ms) {
   var t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast on';
-  setTimeout(function () { t.className = 'toast'; }, 2200);
+  setTimeout(function () { t.className = 'toast'; }, ms || 2200);
 }
 
 function load() {
