@@ -19,6 +19,10 @@ File: [`process-linkedin-job-documents.blueprint.json`](process-linkedin-job-doc
 
 Storage is Google Sheets rather than Airtable, so the scenario runs on free accounts.
 
+## Bonus: job search dashboard
+
+A dashboard tab in the tracking sheet with 3 pie charts, summary tables and a list of all jobs whose status can be changed from the dashboard and is written back to the sheet (Apps Script). See [`DASHBOARD.md`](DASHBOARD.md) and [`dashboard-status.gs`](dashboard-status.gs).
+
 ## How to import
 
 In Make: **Create a new scenario → ⋯ menu → Import Blueprint**, choose the JSON file, then reconnect your own Gmail, Google Drive, Google Docs and Google Sheets connections and pick your own folders and spreadsheet.
