@@ -13,14 +13,6 @@ const FIRST_COL = 7;            // column G (hidden: source row number)
 const SHOW = ['תפקיד', 'חברה', 'סוג תפקיד', 'תאריך', 'קישור למשרה', 'סטטוס'];
 const STATUSES = ['חדש', 'הוגש', 'ראיון', 'נדחה', 'הצעה'];
 
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('דשבורד')
-    .addItem('רענון רשימת המשרות', 'refreshJobs')
-    .addItem('בנייה מחדש של הדשבורד', 'setupDashboard')
-    .addToUi();
-}
-
 // One-time setup: make room for the charts, build them, fill the list, start the 5-minute refresh.
 function setupDashboard() {
   const dash = SpreadsheetApp.getActive().getSheetByName(DASH_SHEET);
@@ -30,6 +22,20 @@ function setupDashboard() {
   buildCharts_(dash);
   installTrigger_();
   refreshJobs();
+}
+
+// Adds a "דשבורד" menu when the sheet is opened. (Runs by itself; not meant to be run from the editor.)
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu('דשבורד')
+      .addItem('רענון רשימת המשרות', 'refreshJobs')
+      .addItem('בנייה מחדש של הדשבורד', 'setupDashboard')
+      .addToUi();
+  } catch (err) {
+    // Run from the editor there is no sheet UI; do the setup instead.
+    setupDashboard();
+  }
 }
 
 function buildCharts_(dash) {
