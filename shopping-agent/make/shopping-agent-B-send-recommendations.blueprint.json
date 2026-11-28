@@ -1,5 +1,5 @@
 {
-  "name": "Shopping Agent B: send recommendations on chosen date",
+  "name": "Shopping Agent – סוכן קניות (B: שליחת המלצות)",
   "flow": [
     {
       "id": 2,

@@ -1,5 +1,5 @@
 {
-  "name": "Shopping Agent A: Tally request to Sheets",
+  "name": "Shopping Agent – סוכן קניות (A: קליטת בקשה)",
   "flow": [
     {
       "id": 1,
