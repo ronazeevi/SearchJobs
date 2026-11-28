@@ -32,7 +32,7 @@
 ```
 לחיצה על "הפעלת התהליך" בדשבורד
   ← Apps Script שולח בקשה ל-Webhook של Make (Webhooks: Custom webhook)
-  ← Gmail: Search emails, מייל ההתראה האחרון שלא נקרא (from:jobalerts-noreply@linkedin.com is:unread, מסומן כנקרא)
+  ← Gmail: Search emails, מייל ההתראה האחרון שלא נקרא (from:jobalerts-noreply@linkedin.com is:unread)
   ← AI ב-Make מחלץ את המשרות: תפקיד, חברה, מיקום, קישור, סוג תפקיד, דרישות
   ← AI כותב קורות חיים מותאמים ושומר ב-Google Docs
   ← Google Sheets: Add a row, שורה חדשה בגיליון1 עם סטטוס "חדש"

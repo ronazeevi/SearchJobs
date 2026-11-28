@@ -9,7 +9,7 @@ Built in [Make.com](https://www.make.com) as a course exercise (Lesson 6, AI pra
 File: [`process-linkedin-job-documents.blueprint.json`](process-linkedin-job-documents.blueprint.json)
 
 1. **Webhooks: Custom webhook**: starts the scenario when the dashboard's "Run the process" button is clicked.
-2. **Gmail: Search emails**: takes the latest unread LinkedIn job alert (`from:jobalerts-noreply@linkedin.com is:unread`,limit 1).
+2. **Gmail: Search emails**: takes the latest unread LinkedIn job alert (`from:jobalerts-noreply@linkedin.com is:unread`, limit 1).
 3. **AI (Make AI Toolkit)**: extracts the jobs in the email into JSON: title, company, location, URL, role type, requirements.
 4. **JSON: Parse JSON**: turns the AI answer into structured data.
 5. **Google Drive: Search files + Download file**: reads my existing CV files from a Drive folder as plain text.
