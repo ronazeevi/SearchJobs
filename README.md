@@ -30,6 +30,14 @@ Live page: https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x
 
 A friend's Make scenario (Tally form → Google Sheets → Gmail/Slack lead routing), imported and connected to my own Tally form. See [`BONUS2.md`](BONUS2.md) (Hebrew) and [`bonus2/integration-tally.blueprint.json`](bonus2/integration-tally.blueprint.json).
 
+## Lesson 6: AI agent design: shopping agent
+
+A design (not yet built) for a personal shopping agent: every purchase request comes from a Tally form with a max price and required features, Make writes it to Google Sheets and starts the agent on Anthropic Managed Agents, the agent searches online stores daily, and every Friday it emails the top picks. It never buys anything itself. All three documents are in Hebrew:
+
+- [`shopping-agent/SPEC.md`](shopping-agent/SPEC.md): the agent design (LLM, tools, memory, goal, loop and brakes, safety) and the Tally form fields.
+- [`shopping-agent/Architecture.md`](shopping-agent/Architecture.md): triggers, what happens with the output, and Mermaid data-flow diagrams of the whole system.
+- [`shopping-agent/CONFIG.md`](shopping-agent/CONFIG.md): model, effort level, tools, full system prompt, memory stores, vault, sessions and deployments.
+
 ## How to import
 
 In Make: **Create a new scenario → ⋯ menu → Import Blueprint**, choose the JSON file, then reconnect your own Gmail, Google Drive, Google Docs and Google Sheets connections and pick your own folders and spreadsheet.
