@@ -1,6 +1,6 @@
 # SearchJobs
 
-The workflow creates a tailored CV for each job I receive by email in Gmail from LinkedIn job alerts.
+The workflow creates a tailored CV for each job I receive by email in Gmail from LinkedIn job alerts. It is started from a button on the job search dashboard (through a Make webhook).
 
 Built in [Make.com](https://www.make.com) as a course exercise (Lesson 6, AI practice).
 
@@ -8,20 +8,25 @@ Built in [Make.com](https://www.make.com) as a course exercise (Lesson 6, AI pra
 
 File: [`process-linkedin-job-documents.blueprint.json`](process-linkedin-job-documents.blueprint.json)
 
-1. **Gmail: Watch emails**: picks up new LinkedIn job alert emails (`jobalerts-noreply@linkedin.com`).
-2. **AI (Make AI Toolkit)**: extracts the jobs in the email into JSON: title, company, location, URL, role type, requirements.
-3. **JSON: Parse JSON**: turns the AI answer into structured data.
-4. **Google Drive: Search files + Download file**: reads my existing CV files from a Drive folder as plain text.
-5. **Text aggregator**: combines all CV material into one text.
-6. **AI (Make AI Toolkit): Generate Resume**: writes a one-page Hebrew CV tailored to the job, using only the material provided.
-7. **Google Docs: Create a document**: saves the tailored CV in the "קורות חיים מותאמים" folder.
-8. **Google Sheets: Add a row**: logs the job in the tracking sheet, including a link to the tailored CV.
+1. **Webhooks: Custom webhook**: starts the scenario when the dashboard's "Run the process" button is clicked.
+2. **Gmail: Search emails**: takes the latest unread LinkedIn job alert (`from:jobalerts-noreply@linkedin.com is:unread`, limit 1) and marks it as read.
+3. **AI (Make AI Toolkit)**: extracts the jobs in the email into JSON: title, company, location, URL, role type, requirements.
+4. **JSON: Parse JSON**: turns the AI answer into structured data.
+5. **Google Drive: Search files + Download file**: reads my existing CV files from a Drive folder as plain text.
+6. **Text aggregator**: combines all CV material into one text.
+7. **AI (Make AI Toolkit): Generate Resume**: writes a one-page Hebrew CV tailored to the job, using only the material provided.
+8. **Google Docs: Create a document**: saves the tailored CV in the "קורות חיים מותאמים" folder.
+9. **Google Sheets: Add a row**: logs the job in the tracking sheet, including a link to the tailored CV.
 
 Storage is Google Sheets rather than Airtable, so the scenario runs on free accounts.
 
 ## Bonus: job search dashboard
 
-A dashboard tab in the tracking sheet with 3 pie charts, summary tables and a list of all jobs whose status can be changed from the dashboard and is written back to the sheet (Apps Script). See [`DASHBOARD.md`](DASHBOARD.md) and [`dashboard-status.gs`](dashboard-status.gs).
+A public web page (Google Apps Script web app) connected live to the tracking sheet: summary cards, 3 pie charts, a list of all jobs whose status can be changed from the page and is written back to the sheet, and a "Run the process" button that starts the Make scenario through its webhook.
+
+Live page: https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x-a0TVh5fZQssUe5mMu8THdLVVDNaq8LZpLYaeZ/exec See [`DASHBOARD.md`](DASHBOARD.md) and [`dashboard-status.gs`](dashboard-status.gs).
+
+> The blueprint file in this repo was exported before the switch to the webhook trigger, so it still starts with Gmail: Watch emails.
 
 ## How to import
 

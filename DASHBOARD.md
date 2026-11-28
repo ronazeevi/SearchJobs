@@ -10,11 +10,11 @@
 
 - **בסיס הנתונים:** Google Sheets, קובץ "חיפוש עבודה", לשונית `גיליון1` (במקום Airtable, כדי לעבוד על חשבונות חינמיים).
 - **הדאשבורד:** לשונית `דשבורד` באותו קובץ.
-- **האוטומציה:** תרחיש ב-Make.com (`process-linkedin-job-documents.blueprint.json` בריפו הזה), שמעדכן את בסיס הנתונים בכל פעם שמגיע מייל משרות.
+- **האוטומציה:** תרחיש ב-Make.com (`process-linkedin-job-documents.blueprint.json` בריפו הזה), שמעדכן את בסיס הנתונים. התרחיש מופעל דרך Webhook, בלחיצה על כפתור בדשבורד.
 
 ## דשבורד בדפדפן
 
-**קישור:** https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x-a0TVh5fZQssUe5mMu8THdLVVDNaq8LZpLYaeZ/exec (פתוח רק לחשבון שלי)
+**קישור:** https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x-a0TVh5fZQssUe5mMu8THdLVVDNaq8LZpLYaeZ/exec (ציבורי: כל מי שיש לו את הקישור יכול לפתוח את הדף)
 
 ![דשבורד בדפדפן](screens/web-dashboard.jpg)
 
@@ -30,12 +30,18 @@
 ## איך האוטומציה מעדכנת את הדאשבורד
 
 ```
-מייל התראת משרות מ-LinkedIn (Gmail)
+לחיצה על "הפעלת התהליך" בדשבורד
+  ← Apps Script שולח בקשה ל-Webhook של Make (Webhooks: Custom webhook)
+  ← Gmail: Search emails, מייל ההתראה האחרון שלא נקרא (from:jobalerts-noreply@linkedin.com is:unread, מסומן כנקרא)
   ← AI ב-Make מחלץ את המשרות: תפקיד, חברה, מיקום, קישור, סוג תפקיד, דרישות
   ← AI כותב קורות חיים מותאמים ושומר ב-Google Docs
   ← Google Sheets: Add a row, שורה חדשה בגיליון1 עם סטטוס "חדש"
   ← לשונית "דשבורד" מתעדכנת מיד
 ```
+
+![ריצות Webhook מוצלחות ב-Make](screens/make-history-webhook.png)
+
+בהיסטוריה של התרחיש ב-Make רואים ריצות מסוג Instant, כלומר הפעלות מה-Webhook, שהסתיימו ב-Success.
 
 ובכיוון ההפוך: שינוי סטטוס ברשימה הנפתחת בדאשבורד ← Apps Script כותב אותו לגיליון1.
 
