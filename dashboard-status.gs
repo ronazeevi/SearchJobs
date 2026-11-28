@@ -241,34 +241,26 @@ function setJobStatus(row, status) {
   return true;
 }
 
-// ----- "Run the process" button: starts the Make scenario through the Make API -----
-// One-time: Project Settings > Script properties > add MAKE_TOKEN (a Make API token with scope scenarios:run).
-const MAKE_ZONE = 'eu1';
-const MAKE_SCENARIO_ID = 8715228; // "Process LinkedIn Job Documents"
-
+// ----- "Run the process" button: calls a Make webhook that starts the scenario -----
+// One-time: Project Settings > Script properties > add MAKE_WEBHOOK_URL (the address of the
+// "Webhooks > Custom webhook" trigger in the Make scenario).
 function runMakeScenario() {
-  const token = PropertiesService.getScriptProperties().getProperty('MAKE_TOKEN');
-  if (!token) throw new Error('חסר MAKE_TOKEN בהגדרות הפרויקט ב-Apps Script');
-  const res = UrlFetchApp.fetch(
-    'https://' + MAKE_ZONE + '.make.com/api/v2/scenarios/' + MAKE_SCENARIO_ID + '/run', {
-      method: 'post',
-      contentType: 'application/json',
-      payload: JSON.stringify({ responsive: false }),
-      headers: { Authorization: 'Token ' + token },
-      muteHttpExceptions: true,
-    });
+  const url = PropertiesService.getScriptProperties().getProperty('MAKE_WEBHOOK_URL');
+  if (!url) throw new Error('חסר MAKE_WEBHOOK_URL במאפייני הסקריפט ב-Apps Script');
+  const res = UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify({ source: 'dashboard', requestedAt: new Date().toISOString() }),
+    muteHttpExceptions: true,
+  });
   const code = res.getResponseCode();
-  if (code >= 300) {
-    let msg = res.getContentText();
-    try { const j = JSON.parse(msg); msg = j.detail || j.message || msg; } catch (e) {}
-    throw new Error('Make ' + code + ': ' + msg);
-  }
-  return JSON.parse(res.getContentText() || '{}');
+  if (code >= 300) throw new Error('Make ' + code + ': ' + res.getContentText());
+  return res.getContentText(); // Make answers "Accepted"
 }
 
-// Run this once from the editor after adding MAKE_TOKEN: it asks for permission and starts one run.
+// Run this once from the editor after adding MAKE_WEBHOOK_URL: it asks for permission and starts one run.
 function testMakeConnection() {
-  Logger.log(JSON.stringify(runMakeScenario()));
+  Logger.log(runMakeScenario());
 }
 
 // Built from dashboard.html
