@@ -9,7 +9,7 @@ Built in [Make.com](https://www.make.com) as a course exercise (Lesson 6, AI pra
 File: [`process-linkedin-job-documents.blueprint.json`](process-linkedin-job-documents.blueprint.json)
 
 1. **Webhooks: Custom webhook**: starts the scenario when the dashboard's "Run the process" button is clicked.
-2. **Gmail: Search emails**: takes the latest unread LinkedIn job alert (`from:jobalerts-noreply@linkedin.com is:unread`, limit 1) and marks it as read.
+2. **Gmail: Search emails**: takes the latest unread LinkedIn job alert (`from:jobalerts-noreply@linkedin.com is:unread`,limit 1).
 3. **AI (Make AI Toolkit)**: extracts the jobs in the email into JSON: title, company, location, URL, role type, requirements.
 4. **JSON: Parse JSON**: turns the AI answer into structured data.
 5. **Google Drive: Search files + Download file**: reads my existing CV files from a Drive folder as plain text.
@@ -25,8 +25,6 @@ Storage is Google Sheets rather than Airtable, so the scenario runs on free acco
 A public web page (Google Apps Script web app) connected live to the tracking sheet: summary cards, 3 pie charts, a list of all jobs whose status can be changed from the page and is written back to the sheet, and a "Run the process" button that starts the Make scenario through its webhook.
 
 Live page: https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x-a0TVh5fZQssUe5mMu8THdLVVDNaq8LZpLYaeZ/exec See [`DASHBOARD.md`](DASHBOARD.md) and [`dashboard-status.gs`](dashboard-status.gs).
-
-> The blueprint file in this repo was exported before the switch to the webhook trigger, so it still starts with Gmail: Watch emails.
 
 ## How to import
 

@@ -2,33 +2,17 @@
     "name": "Process LinkedIn Job Documents",
     "flow": [
         {
-            "id": 1,
-            "module": "google-email:triggerWatchNewEmails",
-            "version": 4,
+            "id": 13,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
             "parameters": {
-                "from": "jobalerts-noreply@linkedin.com",
-                "size": {
-                    "unit": "M",
-                    "amount": null,
-                    "criteria": "larger"
-                },
-                "limit": 1,
-                "folder": "INBOX",
-                "format": "full",
-                "subject": "",
-                "criteria": "is:unread",
-                "labelIds": "",
-                "markSeen": false,
-                "filterType": "simpleSearch",
-                "__IMTCONN__": 13266209,
-                "excludeWords": "",
-                "includeWords": "",
-                "hasAttachment": false
+                "hook": 4197818,
+                "maxResults": 1
             },
             "mapper": {},
             "metadata": {
                 "designer": {
-                    "x": 0,
+                    "x": 300,
                     "y": 0
                 },
                 "setupValidation": {
@@ -37,35 +21,76 @@
                         "fields": []
                     },
                     "version": 1,
-                    "configuration": "861605722f833d64"
+                    "configuration": "298c423ded4affbd"
                 },
                 "restore": {
                     "parameters": {
-                        "size": {
-                            "nested": {
-                                "unit": {
-                                    "label": "MB (megabytes)"
-                                },
-                                "criteria": {
-                                    "label": "Greater than"
-                                }
-                            }
-                        },
-                        "folder": {
-                            "label": "Inbox"
-                        },
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "DahboarfJobSearch"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 14,
+            "module": "google-email:executeEmailSearchQuery",
+            "version": 4,
+            "parameters": {
+                "__IMTCONN__": 13266209
+            },
+            "filter": null,
+            "mapper": {
+                "q": "from:jobalerts-noreply@linkedin.com is:unread",
+                "limit": "1",
+                "format": "full",
+                "filterType": "gmailSearch",
+                "includeHtmlBody": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 0
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "80cfc7cda64cd1d0"
+                },
+                "restore": {
+                    "expect": {
                         "format": {
+                            "mode": "chose",
                             "label": "Full content"
                         },
-                        "criteria": {
-                            "label": "Only unread messages"
-                        },
-                        "labelIds": {
-                            "label": "Empty"
-                        },
                         "filterType": {
-                            "label": "Simple filter"
+                            "mode": "chose",
+                            "label": "Gmail filter"
                         },
+                        "includeHtmlBody": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
                         "__IMTCONN__": {
                             "data": {
                                 "scoped": "true",
@@ -81,7 +106,9 @@
                         "type": "account:google-email",
                         "label": "Connection",
                         "required": true
-                    },
+                    }
+                ],
+                "expect": [
                     {
                         "name": "filterType",
                         "type": "select",
@@ -98,7 +125,6 @@
                         "name": "format",
                         "type": "select",
                         "label": "Content format",
-                        "required": true,
                         "validate": {
                             "enum": [
                                 "full",
@@ -109,33 +135,9 @@
                         }
                     },
                     {
-                        "name": "folder",
-                        "type": "select",
-                        "label": "Folder",
-                        "required": true
-                    },
-                    {
-                        "name": "labelIds",
-                        "type": "select",
-                        "label": "Label"
-                    },
-                    {
-                        "name": "criteria",
-                        "type": "select",
-                        "label": "Criteria",
-                        "required": true,
-                        "validate": {
-                            "enum": [
-                                "all",
-                                "is:read",
-                                "is:unread"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "markSeen",
-                        "type": "boolean",
-                        "label": "Mark email message(s) as read when fetched"
+                        "name": "q",
+                        "type": "text",
+                        "label": "Query"
                     },
                     {
                         "name": "limit",
@@ -147,71 +149,23 @@
                         }
                     },
                     {
-                        "name": "from",
-                        "type": "email",
-                        "label": "Sender email address"
-                    },
-                    {
-                        "name": "subject",
-                        "type": "text",
-                        "label": "Subject"
-                    },
-                    {
-                        "name": "includeWords",
-                        "type": "text",
-                        "label": "Has the words"
-                    },
-                    {
-                        "name": "excludeWords",
-                        "type": "text",
-                        "label": "Doesn't have"
-                    },
-                    {
-                        "name": "size",
-                        "spec": [
-                            {
-                                "name": "criteria",
-                                "type": "select",
-                                "label": "Criteria",
-                                "validate": {
-                                    "enum": [
-                                        "larger",
-                                        "smaller"
-                                    ]
-                                }
-                            },
-                            {
-                                "name": "amount",
-                                "type": "integer",
-                                "label": "Size",
-                                "validate": {
-                                    "min": 0
-                                }
-                            },
-                            {
-                                "name": "unit",
-                                "type": "select",
-                                "label": "Size unit",
-                                "validate": {
-                                    "enum": [
-                                        "M",
-                                        "K",
-                                        "bytes"
-                                    ]
-                                }
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "Email size"
-                    },
-                    {
-                        "name": "hasAttachment",
+                        "name": "includeHtmlBody",
                         "type": "boolean",
-                        "label": "Only emails with attachments/media",
+                        "label": "Include HTML body",
                         "required": true
                     }
                 ],
                 "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
                     {
                         "name": "id",
                         "type": "text",
@@ -465,25 +419,37 @@
             "module": "ai-tools:Ask",
             "version": 2,
             "parameters": {
-                "model": "small",
+                "model": "medium",
                 "makeConnectionId": 13110044
             },
             "mapper": {
-                "input": "מתוך המייל הבא, חלץ את כל המשרות שמופיעות בו.\r\nהחזר אובייקט JSON יחיד בלבד, בלי טקסט נוסף, בלי Markdown ובלי בלוק ```.\r\nהפלט חייב להתחיל בתו { ולהסתיים בתו } — אסור להחזיר מערך שעוטף את האובייקט.\r\nהמבנה:\r\n{\"jobs\":[{\"title\":\"\",\"company\":\"\",\"location\":\"\",\"url\":\"\",\"role_type\":\"\",\"requirements\":\"\"}]}\r\nrole_type: אחד מ: פיתוח, דאטה, מוצר, QA, ניהול פרויקטים, אחר.\r\nאם שדה לא מופיע, השאר ריק.\r\n\r\nהמייל{{1.fullTextBody}}"
+                "input": "מתוך המייל הבא, חלץ את כל המשרות שמופיעות בו.\r\nהחזר אובייקט JSON יחיד בלבד, בלי טקסט נוסף, בלי Markdown ובלי בלוק ```.\r\nהפלט חייב להתחיל בתו { ולהסתיים בתו } — אסור להחזיר מערך שעוטף את האובייקט.\r\nהמבנה:\r\n{\"jobs\":[{\"title\":\"\",\"company\":\"\",\"location\":\"\",\"url\":\"\",\"role_type\":\"\",\"requirements\":\"\"}]}\r\nrole_type: אחד מ: פיתוח, דאטה, מוצר, QA, ניהול פרויקטים, אחר.\r\nאם שדה לא מופיע, השאר ריק.\r\n\r\nהמייל{{14.fullTextBody}}"
             },
             "metadata": {
                 "designer": {
-                    "x": 300,
+                    "x": 900,
                     "y": 0
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "4ea13ea4abf82905"
                 },
                 "restore": {
                     "parameters": {
                         "model": {
                             "mode": "chose",
-                            "label": "Small",
+                            "label": "MediumModel: gpt-5-nano. Reasoning: low. A balanced, quick choice for clearly defined tasks needing reliable answers rather than deep analysis",
                             "nested": []
                         },
                         "makeConnectionId": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "ai-provider"
+                            },
                             "label": "Make's AI Provider (default)"
                         }
                     }
@@ -499,10 +465,7 @@
                         "name": "model",
                         "type": "select",
                         "label": "Model",
-                        "grouped": true,
-                        "mappable": true,
-                        "required": true,
-                        "forceReload": true
+                        "required": true
                     }
                 ],
                 "expect": [
@@ -527,7 +490,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 600,
+                    "x": 1200,
                     "y": 0
                 },
                 "setupValidation": {
@@ -619,7 +582,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 900,
+                    "x": 1500,
                     "y": 0
                 },
                 "restore": {
@@ -956,7 +919,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1200,
+                    "x": 1800,
                     "y": 0,
                     "name": "Download File"
                 },
@@ -1098,7 +1061,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1500,
+                    "x": 2100,
                     "y": 0,
                     "name": "Aggregate Text"
                 },
@@ -1149,7 +1112,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1800,
+                    "x": 2400,
                     "y": 0,
                     "name": "Generate Resume"
                 },
@@ -1219,7 +1182,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 2100,
+                    "x": 2700,
                     "y": 0,
                     "name": "Create Resume Doc"
                 },
@@ -1347,7 +1310,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 2400,
+                    "x": 3000,
                     "y": 0
                 },
                 "restore": {
@@ -1736,7 +1699,7 @@
         }
     ],
     "metadata": {
-        "instant": false,
+        "instant": true,
         "version": 1,
         "scenario": {
             "roundtrips": 1,
