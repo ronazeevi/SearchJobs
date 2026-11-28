@@ -37,6 +37,7 @@ A design (not yet built) for a personal shopping agent: every purchase request c
 - [`shopping-agent/SPEC.md`](shopping-agent/SPEC.md): the agent design (LLM, tools, memory, goal, loop and brakes, safety) and the Tally form fields.
 - [`shopping-agent/Architecture.md`](shopping-agent/Architecture.md): triggers, what happens with the output, and Mermaid data-flow diagrams of the whole system.
 - [`shopping-agent/CONFIG.md`](shopping-agent/CONFIG.md): model, effort level, tools, full system prompt, memory stores, vault, sessions and deployments.
+- [`shopping-agent/make/`](shopping-agent/make/): two importable Make blueprints for a simple runnable version (Tally → Sheets, and a scheduled scenario that emails AI recommendations on the chosen date), not yet tested.
 
 ## How to import
 

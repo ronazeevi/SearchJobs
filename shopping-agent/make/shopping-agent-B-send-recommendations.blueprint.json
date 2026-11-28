@@ -1,0 +1,138 @@
+{
+  "name": "Shopping Agent B: send recommendations on chosen date",
+  "flow": [
+    {
+      "id": 2,
+      "module": "google-sheets:filterRows",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 13273546
+      },
+      "mapper": {
+        "from": "drive",
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING",
+        "limit": "10",
+        "spreadsheetId": "",
+        "sheetId": "בקשות",
+        "includesHeaders": true,
+        "tableFirstRow": "A1:CZ1",
+        "filter": [
+          [
+            {
+              "a": "X",
+              "o": "text:equal",
+              "b": "חדש"
+            }
+          ]
+        ],
+        "sortOrder": "asc"
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "ai-tools:Ask",
+      "version": 2,
+      "parameters": {
+        "model": "large",
+        "makeConnectionId": 13110044
+      },
+      "filter": {
+        "name": "הגיע יום השליחה",
+        "conditions": [
+          [
+            {
+              "a": "{{2.`19`}}",
+              "o": "number:lessorequal",
+              "b": "{{formatDate(now; \"YYYYMMDD\"; \"Asia/Jerusalem\")}}"
+            }
+          ]
+        ]
+      },
+      "mapper": {
+        "input": "אתה סוכן קניות אישי. המשימה: להמליץ על מוצרים לקנייה בישראל לפי הבקשה הבאה. אתה רק ממליץ, לא קונה.\n\nמוצר: {{2.`2`}}\nמחיר מקסימלי כולל משלוח: {{2.`3`}} ₪\nלמי ולאיזה שימוש: {{2.`4`}}\nיודעת איזה סוג: {{2.`5`}}\nמאפייני חובה: {{2.`6`}}\nמאפיינים רצויים: {{2.`7`}}\nלא מתאים: {{2.`8`}}\nמותגים: {{2.`9`}}\nיד שנייה: {{2.`10`}} (מצב מינימלי: {{2.`11`}}, אתרים: {{2.`12`}})\nהזמנה מחו\"ל: {{2.`13`}} (אתרים: {{2.`14`}})\nתוך כמה ימי עסקים להגיע: {{2.`15`}}\nאיך לקבל: {{2.`16`}} {{2.`17`}}\nכמה המלצות: {{2.`20`}}\nהערות: {{2.`22`}}\n\nכללים:\n- רק דגמים שאתה בטוח שקיימים. אל תמציא מחירים מדויקים: תן טווח מחיר משוער ב-₪ וכתוב \"לבדוק מחיר עדכני\".\n- אם ביקשה רשימת סוגים: התחל ב-2 עד 4 סוגים של המוצר במשפט לכל אחד, ואז המלצות לסוג שהכי מתאים לה.\n- לכל המלצה: שם דגם, למה הוא מתאים, טווח מחיר, איפה לחפש (חנויות ישראליות או האתרים מחו\"ל שבחרה), וקישור חיפוש (למשל https://www.zap.co.il/search.aspx?keyword=שם+הדגם).\n- בלי Markdown ובלי ```. החזר HTML בלבד בתוך <div dir=\"rtl\"> עם כותרת, רשימה ממוספרת והערה בסוף: \"הסוכן רק ממליץ. לפני קנייה לבדוק מחיר, אחריות ומדיניות החזרה.\""
+      },
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-email:sendAnEmail",
+      "version": 4,
+      "parameters": {
+        "__IMTCONN__": 13266209
+      },
+      "mapper": {
+        "to": [
+          "{{2.`21`}}"
+        ],
+        "subject": "🛍️ ההמלצות שלך: {{2.`2`}}",
+        "bodyType": "rawHtml",
+        "content": "{{3.answer}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 5,
+      "module": "google-sheets:updateRow",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 13273546
+      },
+      "mapper": {
+        "mode": "select",
+        "from": "drive",
+        "spreadsheetId": "",
+        "sheetId": "בקשות",
+        "rowNumber": "{{2.`__ROW_NUMBER__`}}",
+        "includesHeaders": true,
+        "valueInputOption": "USER_ENTERED",
+        "values": {
+          "23": "נשלחו המלצות"
+        }
+      },
+      "metadata": {
+        "designer": {
+          "x": 900,
+          "y": 0
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": true,
+      "slots": null,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu1.make.com",
+    "notes": []
+  }
+}

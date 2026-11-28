@@ -1,0 +1,90 @@
+{
+  "name": "Shopping Agent A: Tally request to Sheets",
+  "flow": [
+    {
+      "id": 1,
+      "module": "tally:watchNewResponse",
+      "version": 1,
+      "parameters": {},
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "google-sheets:addRow",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 13273546
+      },
+      "mapper": {
+        "mode": "select",
+        "insertUnformatted": false,
+        "valueInputOption": "USER_ENTERED",
+        "insertDataOption": "INSERT_ROWS",
+        "from": "drive",
+        "spreadsheetId": "",
+        "sheetId": "בקשות",
+        "includesHeaders": true,
+        "useColumnHeaders": false,
+        "values": {
+          "0": "{{formatDate(now; \"YYYY-MM-DD HH:mm\"; \"Asia/Jerusalem\")}}",
+          "1": "REQ-{{formatDate(now; \"YYYYMMDD-HHmmss\"; \"Asia/Jerusalem\")}}",
+          "2": "{{1.fields.`מה צריך לקנות?`}}",
+          "3": "{{1.fields.`מחיר מקסימלי בש\"ח, כולל משלוח`}}",
+          "4": "{{ifempty(1.fields.`למי או לאיזה שימוש?`; \"לא רלוונטי\")}}",
+          "5": "{{ifempty(first(1.fields.`אני כבר יודעת איזה סוג בדיוק אני רוצה?`); \"לא, תביא לי קודם רשימת סוגים 🔍\")}}",
+          "6": "{{1.fields.`✅ מאפיינים חובה`}}",
+          "7": "{{1.fields.`💖 מאפיינים רצויים (לא חובה)`}}",
+          "8": "{{1.fields.`🚫 מה לא מתאים לי?`}}",
+          "9": "{{ifempty(1.fields.`🏷️ מותגים מועדפים או כאלה שלא רוצה`; \"כל המותגים\")}}",
+          "10": "{{ifempty(first(1.fields.`♻️ מוכנה לקנות יד שנייה?`); \"רק חדש\")}}",
+          "11": "{{ifempty(first(1.fields.`מצב מינימלי ליד שנייה`); \"לא משנה\")}}",
+          "12": "{{ifempty(join(1.fields.`באיזה אתרי יד שנייה לחפש?`; \", \"); \"כולם\")}}",
+          "13": "{{ifempty(first(1.fields.`✈️ העדפה להזמנה מחו\"ל`); \"גם מחו\"ל\")}}",
+          "14": "{{ifempty(join(1.fields.`באיזה אתרים מחו\"ל לחפש?`; \", \"); \"כל האתרים\")}}",
+          "15": "{{ifempty(1.fields.`⏱️ תוך כמה ימי עסקים המוצר צריך להגיע?`; \"7\")}}",
+          "16": "{{ifempty(first(1.fields.`📦 איך לקבל?`); \"משלוח עד הבית\")}}",
+          "17": "{{first(1.fields.`באיזו עיר נוח לך לאסוף?`)}}",
+          "18": "{{ifempty(first(1.fields.`📬 מתי לשלוח לך את ההמלצות?`); \"בעוד 3 ימים\")}}",
+          "19": "{{formatDate(addDays(now; switch(first(1.fields.`📬 מתי לשלוח לך את ההמלצות?`); \"⚡ עכשיו, היום\"; 0; \"מחר\"; 1; \"בעוד יומיים\"; 2; \"בעוד 3 ימים\"; 3; \"בעוד 5 ימים (הכי יסודי)\"; 5; 3)); \"YYYYMMDD\"; \"Asia/Jerusalem\")}}",
+          "20": "{{ifempty(first(1.fields.`🏆 כמה המלצות לשלוח לך?`); \"3\")}}",
+          "21": "{{lower(trim(1.fields.`📧 לאן לשלוח לך את התוצאות?`))}}",
+          "22": "{{1.fields.`📝 עוד משהו שכדאי לסוכן לדעת?`}}",
+          "23": "חדש"
+        }
+      },
+      "metadata": {
+        "designer": {
+          "x": 300,
+          "y": 0
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": true,
+      "slots": null,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu1.make.com",
+    "notes": []
+  }
+}
