@@ -32,7 +32,7 @@ A friend's Make scenario (Tally form → Google Sheets → Gmail/Slack lead rout
 
 ## Lesson 6: AI agent design: shopping agent
 
-A design (not yet built) for a personal shopping agent: every purchase request comes from a Tally form with a max price and required features, Make writes it to Google Sheets and starts the agent on Anthropic Managed Agents, the agent searches online stores daily, and every Friday it emails the top picks. It never buys anything itself. All three documents are in Hebrew:
+A design (not yet built) for a personal shopping agent: every purchase request comes from a short [Tally form](https://tally.so/r/QoVkZG) (product, max price, email; everything else is optional with sensible defaults). Make writes it to Google Sheets and starts the agent on Anthropic Managed Agents. The agent searches online stores daily until the date chosen in the form (today up to 5 days), then emails the top picks to the address from the form and stops. It never buys anything itself. All three documents are in Hebrew:
 
 - [`shopping-agent/SPEC.md`](shopping-agent/SPEC.md): the agent design (LLM, tools, memory, goal, loop and brakes, safety) and the Tally form fields.
 - [`shopping-agent/Architecture.md`](shopping-agent/Architecture.md): triggers, what happens with the output, and Mermaid data-flow diagrams of the whole system.

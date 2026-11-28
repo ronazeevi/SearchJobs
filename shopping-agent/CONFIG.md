@@ -24,9 +24,11 @@
 | סביבה | `shop-cloud`: ענן Anthropic, רשת פתוחה |
 | Vault | `shop-vault`: מפתח השער של Make, מוזרק רק ל-`hook.eu1.make.com` |
 | זיכרון | `shop-profile` (קריאה בלבד) + `shop-notes` (קריאה וכתיבה) |
-| תקציב | 1.50$ לריצה יומית · 2.00$ לריצת שישי · 1.00$ לבקשה חדשה |
+| תקציב | 1.50$ לריצה יומית · 1.00$ לבקשה חדשה |
 | בלם סבבים | 30 (כלל בהוראות; התקציב הוא הבלם הקשיח) |
-| טריגרים | בקשה חדשה (Make A) · בחרתי סוג (Make E) · `0 8 * * 0-4` · `0 9 * * 5` (Asia/Jerusalem) |
+| טריגרים | בקשה חדשה (Make A) · בחרתי סוג (Make E) · `0 8 * * *` (Asia/Jerusalem) |
+| מייל המלצות | לכל בקשה ביום שבחרה בטופס (`send_date`), לכתובת מהטופס. הנמען נקבע ב-Make, לא בסוכן |
+| טופס | [https://tally.so/r/QoVkZG](https://tally.so/r/QoVkZG) |
 | שני שלבים | שלב 1: רשימת סוגים → אני בוחרת → שלב 2: הצעות |
 | גרסה נעוצה | Deployments מצביעים על גרסה 1 |
 
@@ -140,7 +142,7 @@ curl -X POST https://api.anthropic.com/v1/agents \
       -H "x-make-apikey: $MAKE_GATEWAY_KEY" -H "content-type: application/json" \
       -d '<JSON עם action>'
   פעולות: list_open_requests, upsert_type, send_types_email, upsert_offer,
-  log_price, set_request_status, send_weekly_email. התשובה היא JSON עם ok: true/false.
+  log_price, set_request_status, send_recommendations_email. התשובה היא JSON עם ok: true/false.
 - bash משמש רק לקריאות לשער. לא להריץ שום דבר אחר.
 
 ## שני שלבים
@@ -184,9 +186,15 @@ curl -X POST https://api.anthropic.com/v1/agents \
    g. אם יש לפחות הצעה תקינה אחת: set_request_status ל"נמצאו הצעות".
    h. לעדכן את requests/<request_id>.md: ביטויים שנוסו, חנויות שנבדקו, מה לבדוק מחר.
 5. לעדכן stores.md, lessons.md, last-run.md.
-6. רק בריצת שישי: לכל בקשה פתוחה לבחור את ההמלצות הטובות ביותר (המספר מהשדה
-   "כמה המלצות", ברירת מחדל 3) ולקרוא ל-send_weekly_email פעם אחת. בקשות
-   ב"ממתין לבחירת סוג" מופיעות במייל בשורה "מחכה שתבחרי סוג".
+6. לכל בקשה שה-send_date שלה הוא היום (או שעבר): לבחור את ההמלצות הטובות
+   ביותר (המספר מהשדה "כמה המלצות", ברירת מחדל 3) ולקרוא ל-
+   send_recommendations_email עם request_id, פעם אחת לבקשה. לא שולחים כתובת:
+   Make לוקח אותה מהשורה. אין הצעה תקינה: לשלוח בכל זאת, ולכתוב מה נבדק ולמה
+   כלום לא עבר. בקשה ב"ממתין לבחירת סוג": במייל תזכורת לבחור סוג.
+   בקשה ב"מעקב מחיר": רק לבדוק את ההמלצות שנשלחו, ואם מחיר ירד מתחת לסכום
+   ההתראה, לשלוח send_recommendations_email עם kind:"price_drop".
+   קופונים מופעלים: לכל הצעה טובה לחפש קוד הנחה פעיל של אותה חנות, ולשמור
+   coupon_code ו-price_after_coupon רק אם כתוב שהוא בתוקף.
 7. לסיים בדוח של עד 5 שורות: כמה בקשות נבדקו, כמה הצעות חדשות, שינויי מחיר
    חשובים, ומה צריך בדיקה.
 
@@ -222,7 +230,7 @@ curl -X POST https://api.anthropic.com/v1/agents \
 - לקנות, להוסיף לעגלה, להירשם, להתחבר, או למלא טופס בשום אתר.
 - לשנות סטטוס ל"נקנה" או "בוטל". זה של המשתמשת.
 - לפנות למוכרים (הודעה, תגובה, טלפון) או להתחבר לאתר מודעות.
-- לשלוח מייל חוץ מ-send_types_email בשלב 1 ו-send_weekly_email בריצת שישי.
+- לשלוח מייל חוץ מ-send_types_email בשלב 1 ו-send_recommendations_email ביום השליחה של בקשה. אסור לשים כתובת מייל בשום קריאה.
 - להדפיס, לשמור או לשלוח את $MAKE_GATEWAY_KEY או כל משתנה סביבה.
 - להשתמש ב-bash לכל דבר שאינו קריאה לשער.
 
@@ -237,7 +245,7 @@ curl -X POST https://api.anthropic.com/v1/agents \
 "ממתין לבחירת סוג".
 ריצה יומית גמורה כש: כל בקשה שנבחרה נבדקה, לכל אחת עד 5 הצעות עדכניות בגיליון,
 אף הצעה לא נכתבה פעמיים, והמחברת עודכנה.
-ריצת שישי גמורה כש: כל זה, ונשלח מייל אחד.
+יום שליחה גמור כש: כל זה, ולכל בקשה שהיום יום השליחה שלה נשלח מייל אחד.
 ```
 
 ---
@@ -248,13 +256,13 @@ curl -X POST https://api.anthropic.com/v1/agents \
 
 | action | קלט | פלט | כללים שנאכפים ב-Make |
 |---|---|---|---|
-| `list_open_requests` | `{}` | `{ok, requests:[{request_id, item, use, max_price, knows_type, chosen_type, must_have[], nice_to_have[], exclude[], brands, second_hand:"רק חדש"\|"גם יד שנייה"\|"רק יד שנייה", min_condition, abroad:"רק מישראל"\|"גם מחו\"ל"\|"מעדיפה מחו\"ל", max_business_days\|null, delivery, city, search_until, picks, notes, status}]}` | רק סטטוסים `חדש`/`בירור סוגים`/`ממתין לבחירת סוג`/`בחיפוש`/`נמצאו הצעות` |
+| `list_open_requests` | `{}` | `{ok, requests:[{request_id, item, use, max_price, knows_type, chosen_type, must_have[], nice_to_have[], exclude[], brands, second_hand:"רק חדש"\|"גם יד שנייה"\|"רק יד שנייה", min_condition, abroad:"רק מישראל"\|"גם מחו\"ל"\|"מעדיפה מחו\"ל", max_business_days\|null, delivery, city, send_date, send_today:true\|false, picks, audience, color_size, min_warranty_months, official_importer_only, min_return_days, coupons:true\|false, price_alert_below\|null, notes, status}]}` | רק סטטוסים `חדש`/`בירור סוגים`/`ממתין לבחירת סוג`/`בחיפוש`/`נמצאו הצעות`/`מעקב מחיר`. **בלי עמודת המייל**: הסוכן לא רואה את הכתובת. שדות ריקים כבר מולאו בברירת מחדל בתרחיש A |
 | `upsert_type` | `{request_id, type_name, summary, pros[], cons[], price_new, price_used, fits_if, check_features[3], in_budget, recommended, run_id}` | `{ok, type_id, action}` | מפתח `request_id + type_name`. עד 6 לבקשה. רק לבקשה ב`בירור סוגים` |
 | `send_types_email` | `{request_id, subject, html_body, run_id}` | `{ok}` | **נמען קבוע**. פעם אחת לבקשה. Make מוסיף לבד קישור לדשבורד |
 | `upsert_offer` | ראו למטה | `{ok, offer_id, action:"inserted"\|"updated"}` | מפתח: `request_id + product_url`. חובה `product_url`, `final_price`. `request_id` חייב להיות קיים ופתוח |
 | `log_price` | `{offer_id, final_price, in_stock, run_id}` | `{ok, action:"inserted"\|"skipped_same_day"}` | פעם אחת ליום להצעה |
-| `set_request_status` | `{request_id, status, run_id}` | `{ok}` או `{ok:false, error:"status_not_allowed"}` | מותר רק `בירור סוגים` (מ`חדש`), `ממתין לבחירת סוג` (מ`בירור סוגים`, ורק אם יש לפחות 3 סוגים), `נמצאו הצעות` (מ`בחיפוש`). את `בחיפוש` אחרי בחירה עושה רק תרחיש E. לא נוגע בבקשה שכבר `נקנה`/`בוטל`/`פג תוקף` |
-| `send_weekly_email` | `{subject, html_body, run_id}` | `{ok}` | **הנמען קבוע בתוך Make**. רק פעם אחת ביום שישי (Data store של Make שומר "נשלח היום") |
+| `set_request_status` | `{request_id, status, run_id}` | `{ok}` או `{ok:false, error:"status_not_allowed"}` | מותר רק `בירור סוגים` (מ`חדש`), `ממתין לבחירת סוג` (מ`בירור סוגים`, ורק אם יש לפחות 3 סוגים), `נמצאו הצעות` (מ`בחיפוש`). את `בחיפוש` אחרי בחירה עושה רק תרחיש E. לא נוגע בבקשה שכבר `נקנה`/`בוטל`/`נשלחו המלצות`/`פג תוקף` |
+| `send_recommendations_email` | `{request_id, kind:"recommendations"\|"price_drop", subject, html_body, run_id}` | `{ok}` או `{ok:false, error:"not_send_day"\|"already_sent"\|"recipient_not_allowed"}` | **Make לוקח את הנמען מעמודת המייל בשורת הבקשה** ובודק שהוא ברשימת הכתובות המותרות. `recommendations`: רק כש-`send_date` ≤ היום, פעם אחת לבקשה, ואז הסטטוס עובר ל-`נשלחו המלצות` (או `מעקב מחיר` אם יש התראה). `price_drop`: רק בבקשה ב-`מעקב מחיר`, עד פעם ביום |
 
 **`upsert_offer` קלט מלא:**
 
@@ -457,37 +465,15 @@ vault_ids: [vlt_SHOP_VAULT]
 resources:
   - {type: memory_store, memory_store_id: memstore_PROFILE, access: read_only}
   - {type: memory_store, memory_store_id: memstore_NOTES, access: read_write}
-schedule: {type: cron, expression: "0 8 * * 0-4", timezone: Asia/Jerusalem}
+schedule: {type: cron, expression: "0 8 * * *", timezone: Asia/Jerusalem}
 budget: {type: limit, max_list_cost: {amount: "150", currency: USD}}
 initial_events:
   - type: user.message
     content:
       - type: text
         text: |
-          ריצה יומית: תבדוק את כל הבקשות הפתוחות לפי ההוראות.
-          לא לשלוח מייל היום.
-```
-
-### 8.3 ריצת שישי: Deployment
-
-```yaml
-# deployment-weekly.yaml
-name: shop-weekly
-agent: ./agent.md
-environment_id: ./environment.yaml
-vault_ids: [vlt_SHOP_VAULT]
-resources:
-  - {type: memory_store, memory_store_id: memstore_PROFILE, access: read_only}
-  - {type: memory_store, memory_store_id: memstore_NOTES, access: read_write}
-schedule: {type: cron, expression: "0 9 * * 5", timezone: Asia/Jerusalem}
-budget: {type: limit, max_list_cost: {amount: "200", currency: USD}}
-initial_events:
-  - type: user.message
-    content:
-      - type: text
-        text: |
-          ריצת שישי: תעדכן את כל הבקשות הפתוחות, ואז תשלוח את המייל השבועי
-          עם ההמלצות (send_weekly_email, פעם אחת).
+          ריצה יומית: תבדוק את כל הבקשות הפתוחות לפי ההוראות, ותשלח
+          send_recommendations_email לכל בקשה שהיום יום השליחה שלה.
 ```
 
 **הערות:**
@@ -504,7 +490,6 @@ initial_events:
 |---|---|---|---|
 | תקציב לבקשה חדשה | 1.00$ | `budget` ב-session של Make | ✔ הפלטפורמה עוצרת (`budget_reached`) |
 | תקציב ריצה יומית | 1.50$ | `budget` ב-`shop-daily` | ✔ |
-| תקציב שישי | 2.00$ | `budget` ב-`shop-weekly` | ✔ |
 | 30 סבבים | 30 | system prompt | ✘ כלל. התקציב הוא רשת הביטחון |
 | 5 בקשות / 8 דפים / 5 הצעות | | system prompt | ✘ כלל |
 | 3 שגיאות ברצף | | system prompt | ✘ כלל |
