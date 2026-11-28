@@ -174,11 +174,12 @@ curl -X POST https://api.anthropic.com/v1/agents \
    e2. אם "יד שנייה" הוא "גם" או "רק": לחפש גם במודעות פומביות שנפתחות בלי
       התחברות. לכל מודעה: מחיר, מצב, תאריך פרסום, עיר. לא לשמור שם או טלפון של
       המוכר. "רק חדש": לא להציע יד שנייה בכלל.
-   e3. אם "אתרים בינלאומיים" הוא "כן": לבדוק גם SHEIN, AliExpress, Temu, Amazon
-      ודומים. מחיר סופי כולל משלוח לישראל, ומע"מ/מכס מעל סף הפטור שב-
+   e3. לפי "העדפה להזמנה מחו"ל": "רק מישראל" = לא להציע אתרים מחו"ל.
+      "גם מחו"ל" = לבדוק גם SHEIN, AliExpress, Temu, Amazon ודומים ולהשוות ביחד.
+      "מעדיפה מחו"ל" = להתחיל מהם, ולהצעה מחו"ל בונוס 10 בציון. מחיר סופי כולל משלוח לישראל, ומע"מ/מכס מעל סף הפטור שב-
       preferences.md (לסמן "כולל הערכת מס"). לבדוק את המוכר הספציפי, לא רק את
       האתר. מוצר תלוי מידה: לצרף טבלת מידות ולסמן "לבדוק מידה". דף שלא נקרא:
-      לדלג, לא לנחש. "לא": לא להציע אתרים מחו"ל.
+      לדלג, לא לנחש.
    f. לתת ציון לפי המחוון. לכל הצעה תקינה: upsert_offer ואז log_price.
    g. אם יש לפחות הצעה תקינה אחת: set_request_status ל"נמצאו הצעות".
    h. לעדכן את requests/<request_id>.md: ביטויים שנוסו, חנויות שנבדקו, מה לבדוק מחר.
@@ -247,7 +248,7 @@ curl -X POST https://api.anthropic.com/v1/agents \
 
 | action | קלט | פלט | כללים שנאכפים ב-Make |
 |---|---|---|---|
-| `list_open_requests` | `{}` | `{ok, requests:[{request_id, item, use, max_price, knows_type, chosen_type, must_have[], nice_to_have[], exclude[], brands, second_hand:"רק חדש"\|"גם יד שנייה"\|"רק יד שנייה", min_condition, international:bool, max_business_days\|null, delivery, city, search_until, picks, notes, status}]}` | רק סטטוסים `חדש`/`בירור סוגים`/`ממתין לבחירת סוג`/`בחיפוש`/`נמצאו הצעות` |
+| `list_open_requests` | `{}` | `{ok, requests:[{request_id, item, use, max_price, knows_type, chosen_type, must_have[], nice_to_have[], exclude[], brands, second_hand:"רק חדש"\|"גם יד שנייה"\|"רק יד שנייה", min_condition, abroad:"רק מישראל"\|"גם מחו\"ל"\|"מעדיפה מחו\"ל", max_business_days\|null, delivery, city, search_until, picks, notes, status}]}` | רק סטטוסים `חדש`/`בירור סוגים`/`ממתין לבחירת סוג`/`בחיפוש`/`נמצאו הצעות` |
 | `upsert_type` | `{request_id, type_name, summary, pros[], cons[], price_new, price_used, fits_if, check_features[3], in_budget, recommended, run_id}` | `{ok, type_id, action}` | מפתח `request_id + type_name`. עד 6 לבקשה. רק לבקשה ב`בירור סוגים` |
 | `send_types_email` | `{request_id, subject, html_body, run_id}` | `{ok}` | **נמען קבוע**. פעם אחת לבקשה. Make מוסיף לבד קישור לדשבורד |
 | `upsert_offer` | ראו למטה | `{ok, offer_id, action:"inserted"\|"updated"}` | מפתח: `request_id + product_url`. חובה `product_url`, `final_price`. `request_id` חייב להיות קיים ופתוח |
