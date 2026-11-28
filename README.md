@@ -26,6 +26,10 @@ A public web page (Google Apps Script web app) connected live to the tracking sh
 
 Live page: https://script.google.com/macros/s/AKfycbyNZaFYrCRvWz0t6QNS0TpN3Iuo2x-a0TVh5fZQssUe5mMu8THdLVVDNaq8LZpLYaeZ/exec See [`DASHBOARD.md`](DASHBOARD.md) and [`dashboard-status.gs`](dashboard-status.gs).
 
+## Bonus 2: imported automation
+
+A friend's Make scenario (Tally form → Google Sheets → Gmail/Slack lead routing), imported and connected to my own Tally form. See [`BONUS2.md`](BONUS2.md) (Hebrew) and [`bonus2/integration-tally.blueprint.json`](bonus2/integration-tally.blueprint.json).
+
 ## How to import
 
 In Make: **Create a new scenario → ⋯ menu → Import Blueprint**, choose the JSON file, then reconnect your own Gmail, Google Drive, Google Docs and Google Sheets connections and pick your own folders and spreadsheet.
